@@ -13,19 +13,25 @@ uint RandomUInt(uint x, uint y, uint max)
     return hash % max;
 }
 
-RWTexture2D<float4> Result;
-Texture2D<float4> Source;
-Texture2D<float4> Pallete;
-Texture2DArray<float4> Atlas;
-uint2 PalletSize;
-uint NumAtlas;
-uint2 AtlasFrameSize;
+RWTexture2D<float4> Result; // Output texture
 uint2 ResultSize;
-uint2 TikTokSize;
-uint2 FrameCoord;
-uint AtlasIndex;
-uint NumVariants;
-uint ScrollOffset;
+
+Texture2D<float4> Source; // Source texture
+
+Texture2D<float4> Pallete; // Pallete texture for mapping tik toks to a given color
+uint2 PalletSize; // Size of pallet
+
+Texture2DArray<float4> Atlas;
+uint2 AtlasFrameSize; // Number of frames stored in each Atlas texture
+uint NumVariants; // Number of variants stored in texture array
+uint NumAtlas; // Number of atlas stored in texture array (to overcome texture size limit for more frames)
+
+uint2 TikTokSize; // Size of tik tok pixel
+
+uint AtlasIndex; // Which atlas we need to grab the frame from (to overcome texture size limit for more frames)
+uint2 FrameCoord; // Which frame of the tik tok to render
+
+uint ScrollOffset; // Scrolling pixel offset to next variant of tik tok
 
 [numthreads(8,8,1)] // 8x8 threads per group, can tune
 void TikTok (uint3 id : SV_DispatchThreadID)
