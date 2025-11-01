@@ -44,14 +44,14 @@ void TikTok (uint3 id : SV_DispatchThreadID)
     sourceCoord.x = id.x / TikTokSize.x;
     sourceCoord.y = id.y / TikTokSize.y;
 
-	float3 src = Source.Load(uint3(sourceCoord, 0));
+	float4 src = Source.Load(uint3(sourceCoord, 0));
 
 	uint2 chosen = uint2(0, 0);
-	float dist = 1.0 / 0.0;
+	float dist = 1.0 / 0.0; // Infinity
 	for (uint i = 0; i < PalletSize.x; ++i) {
 	 	for (uint j = 0; j < PalletSize.y; ++j) {
 	 		uint2 coord = int2(i, j);
-	 		float3 palColor = Pallete.Load(uint3(coord, 0));
+	 		float4 palColor = Pallete.Load(uint3(coord, 0));
 	 		float d = dot(src - palColor, src - palColor);
 	 		if (d < dist) {
 	 			dist = d;
