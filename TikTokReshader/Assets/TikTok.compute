@@ -1,0 +1,67 @@
+#pragma kernel TikTok
+
+uint Hash2D(uint x, uint y)
+{
+    uint h = x * 374761393u + y * 668265263u;
+    h = (h ^ (h >> 13)) * 1274126177u;
+    return h;
+}
+
+uint RandomUInt(uint x, uint y, uint max)
+{
+    uint hash = Hash2D(x, y);
+    return hash % max;
+}
+
+RWTexture2D<float4> Result;
+Texture2D<float4> Source;
+Texture2D<float4> Pallete;
+Texture2DArray<float4> Atlas;
+uint2 PalletSize;
+uint NumAtlas;
+uint2 AtlasFrameSize;
+uint2 ResultSize;
+uint2 TikTokSize;
+uint2 FrameCoord;
+uint AtlasIndex;
+uint NumVariants;
+uint ScrollOffset;
+
+[numthreads(8,8,1)] // 8x8 threads per group, can tune
+void TikTok (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= ResultSize.x || id.y >= ResultSize.y)
+        return;
+
+    // Compute which source pixel corresponds to this output pixel
+    uint2 sourceCoord;
+    sourceCoord.x = id.x / TikTokSize.x;
+    sourceCoord.y = id.y / TikTokSize.y;
+
+	float3 src = Source.Load(uint3(sourceCoord, 0));
+
+	uint2 chosen = uint2(0, 0);
+	float dist = 1.0 / 0.0;
+	for (uint i = 0; i < PalletSize.x; ++i) {
+	 	for (uint j = 0; j < PalletSize.y; ++j) {
+	 		uint2 coord = int2(i, j);
+	 		float3 palColor = Pallete.Load(uint3(coord, 0));
+	 		float d = dot(src - palColor, src - palColor);
+	 		if (d < dist) {
+	 			dist = d;
+	 			chosen = coord;
+	 		}
+	 	}
+	}
+
+	uint variant = RandomUInt(id.x, id.y, NumVariants);
+	uint yScrolled = id.y + ScrollOffset;
+	uint2 vidCoord = uint2(id.x % TikTokSize.x, yScrolled % TikTokSize.y);
+	variant = (variant - (yScrolled / TikTokSize.y)) % NumVariants;
+
+	uint2 tiktokCoord;
+	tiktokCoord.x = FrameCoord.x * TikTokSize.x * PalletSize.x + chosen.x * TikTokSize.x + vidCoord.x;
+	tiktokCoord.y = FrameCoord.y * TikTokSize.y * PalletSize.y + chosen.y * TikTokSize.y + vidCoord.y;
+
+    Result[id.xy] = Atlas.Load(uint4(tiktokCoord, variant * NumAtlas + AtlasIndex, 0));
+}
