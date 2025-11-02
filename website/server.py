@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import pyautogui
-from time import sleep 
+from time import sleep
+import os
 
 ### Desktop Logic ###
 # Maps from received gestures to desktop actions
@@ -57,6 +58,7 @@ def execute_action(gesture):
 
 ### Website Code ###
 app = Flask(__name__)
+app.config['VIDEO_FOLDER'] = os.path.join(app.root_path, 'static', 'videos')
 
 @app.route('/')
 def index():
@@ -88,6 +90,10 @@ def button(button_id):
 
    execute_action(button_id)
    return '', 204
+
+@app.route('/video/<int:video_id>', methods=['GET'])
+def video(video_id):
+   return send_from_directory(app.config['VIDEO_FOLDER'], f"{video_id}.mp4")
 
 if __name__ == '__main__':
     # For development only
