@@ -5,21 +5,30 @@ from time import sleep
 import os
 
 ### Desktop Logic ###
+MOUSE_HOLD_TIME = 0.1
+KEY_HOLD_TIME = 0.3
+TURN_HOLD_TIME = 0.1
+
 ACTIONS = {
-    "forward": lambda: press_for("w", 1),
-    "backward": lambda: press_for("s", 1),
-    "interact": lambda: pyautogui.click(button="right"),
-    "shoot": lambda: pyautogui.click(),
-    "strafe_left": lambda: pyautogui.press_for("a",1),
-    "strafe_right": lambda: pyautogui.press_for("d",1),
-    "camera_left": lambda: press_for("left", 1),
-    "camera_right": lambda: press_for("right", 1),
+    "forward": lambda: press_for("w"),
+    "backward": lambda: press_for("s"),
+    "interact": lambda: mouse_click("right"),
+    "shoot": lambda: mouse_click("left"),
+    "strafe_left": lambda: pyautogui.press_for("a"),
+    "strafe_right": lambda: pyautogui.press_for("d"),
+    "camera_left": lambda: press_for("left", TURN_HOLD_TIME),
+    "camera_right": lambda: press_for("right", TURN_HOLD_TIME),
 }
 
 class ActionException(Exception):
     pass
 
-def press_for(key, duration):
+def mouse_click(button):
+    pyautogui.mouseUp(button=button)
+    sleep(MOUSE_HOLD_TIME)
+    pyautogui.mouseDown(button=button)
+
+def press_for(key, duration=KEY_HOLD_TIME):
     pyautogui.keyDown(key)
     sleep(duration)
     pyautogui.keyUp(key)
