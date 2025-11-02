@@ -31,32 +31,22 @@ html, body {
   let onSwipe = (direction, ev) => {
     document.getElementById('container').textContent = "move " + direction;
 
-    fetch(`/swipe?direction=${direction}`,
-    {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      }
-    )
+    let action = (direction == "up") ? "forward" : (direction == "down") ? "backard" : null;
+
+    if (action) {
+      fetch(`/action/${direction}`, {method: 'POST'})
+    }
   }
   let onTap = (info) => {
     document.getElementById('container').textContent = "tap";
 
-    fetch(`/tap`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      }
+    fetch(`/action/interact`, {method: 'POST'}
     )
   }
   let onDoubleTap = (info) => {
     document.getElementById('container').textContent = "doubletap";
 
-    fetch(`/tap?double`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      }
-    )
+    fetch(`/action/shoot`, {method: 'POST'})
   }
 
   // Internal gesture state
