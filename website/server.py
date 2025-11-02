@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, send_from_directory, make_response
 import pyautogui
 from time import sleep
 import os
@@ -16,6 +16,9 @@ ACTIONS = {
     "camera_right": lambda: press_for("right", 1),
 }
 
+class ActionException(Exception):
+    pass
+
 def press_for(key, duration):
     pyautogui.keyDown(key)
     sleep(duration)
@@ -28,12 +31,9 @@ def execute_action(action):
         func = ACTIONS[action]
         func()
 
-    except TypeError as e:
-        print(f"{action} is an invalid action. Not executing... {e}")
-
-    except Exception as e:
-        print(f"No message parsed: {e}")
-
+    except KeyError as e:
+        print(f"{action} action not recognised... {e}")
+        raise ActionException(f"{action} action not recognised... {e}")
 
 ### Website Code ###
 app = Flask(__name__)
@@ -45,8 +45,11 @@ def index():
 
 @app.route('/action/<string:action_id>', methods=['POST'])
 def action(action_id):
-   execute_action(action_id)
-   return '', 204
+    try:
+        execute_action(action_id)
+        return '', 204
+    except ActionException:
+        return make_response(f"Unable to run action {action_id}", 500)
 
 @app.route('/video/<int:video_id>', methods=['GET'])
 def video(video_id):
