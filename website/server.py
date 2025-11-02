@@ -5,7 +5,7 @@ from time import sleep
 import os
 
 ### Desktop Logic ###
-MOUSE_HOLD_TIME = 0.1
+MOUSE_HOLD_TIME = 0.2
 KEY_HOLD_TIME = 0.3
 TURN_HOLD_TIME = 0.1
 
