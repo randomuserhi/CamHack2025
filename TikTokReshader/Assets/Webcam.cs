@@ -72,6 +72,7 @@ public class Webcam : MonoBehaviour {
     public AnimationCurve scrollCurve;
     public float scrollAnimDuration = 0.5f;
     private int scroll = 0; // Pixel scroll of each tik tok frame
+    private int scrollMultiple = 0;
     private float scrollTimer = 0.0f; // Scroll animation timer
 
     void Start() {
@@ -143,6 +144,8 @@ public class Webcam : MonoBehaviour {
 
             if (scrollTimer > scrollAnimDuration) {
                 scrollTimer = 0.0f;
+                scroll = 0;
+                ++scrollMultiple;
             }
         }
 
@@ -175,7 +178,7 @@ public class Webcam : MonoBehaviour {
 
         Graphics.Blit(downscaleTexture, previousDownscaledTexture);
 
-        tiktokShader.SetInt("ScrollOffset", scroll);
+        tiktokShader.SetInt("ScrollOffset", scrollMultiple * tikTokHeight + scroll);
         tiktokShader.SetInt("AtlasIndex", frame / 36);
 
         int subFrame = frame % 36;
