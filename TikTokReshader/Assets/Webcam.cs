@@ -171,7 +171,7 @@ public class Webcam : MonoBehaviour {
             float motionFraction = activeCount / pixels.Length;
 
             // If there is motion, reset frame index to first frame of tik tok
-            if (activeCount > 0.05f) {
+            if (activeCount > 0.1f) {
                 frame = 0;
             }
         }

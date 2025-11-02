@@ -36,7 +36,7 @@ Shader "Custom/DiffShader"
 
                 float lumA = dot(a, float3(0.299, 0.587, 0.114));
 				float lumB = dot(b, float3(0.299, 0.587, 0.114));
-				float diff = step(0.1, abs(lumA - lumB));
+				float diff = step(0.15, abs(lumA - lumB));
                 
 				return fixed4(diff, diff, diff, 1);
             }
