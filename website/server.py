@@ -53,7 +53,7 @@ def action(action_id):
 
 @app.route('/video/<int:video_id>', methods=['GET'])
 def video(video_id):
-   return send_from_directory(app.config['VIDEO_FOLDER'], f"{video_id}.mp4")
+    return send_from_directory(app.config['VIDEO_FOLDER'], f"{video_id}.mp4")
 
 if __name__ == '__main__':
     # For development only
