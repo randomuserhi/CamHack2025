@@ -83,15 +83,11 @@ def tap():
 
     return '', 204
 
-#@app.route('/button', methods=['POST'])
-#def tap():
-#    button = request.args.get('button')
-#    if not button:
-#        return jsonify({"error": "'direction' parameter is required"}), 400
+@app.route('/button/<string:button_id>', methods=['POST'])
+def button(button_id):
 
-#    execute_action(button)
-
-#    return '', 204
+   execute_action(button_id)
+   return '', 204
 
 if __name__ == '__main__':
     # For development only
