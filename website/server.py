@@ -14,8 +14,8 @@ ACTIONS = {
     "backward": lambda: press_for("s"),
     "interact": lambda: mouse_click("right"),
     "shoot": lambda: mouse_click("left"),
-    "strafe_left": lambda: pyautogui.press_for("a"),
-    "strafe_right": lambda: pyautogui.press_for("d"),
+    "strafe_left": lambda: press_for("a"),
+    "strafe_right": lambda: press_for("d"),
     "camera_left": lambda: press_for("left", TURN_HOLD_TIME),
     "camera_right": lambda: press_for("right", TURN_HOLD_TIME),
 }
