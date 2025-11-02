@@ -32,9 +32,6 @@ public class Webcam : MonoBehaviour {
     public Texture2D[] atlas;
     private Texture2DArray textureArray;
 
-    // Post-processing effect on the initially captured image
-    // public Material effect;
-
     // Output render texture
     public RenderTexture outTexture;
 
@@ -42,6 +39,17 @@ public class Webcam : MonoBehaviour {
     // Each pixel represents a single tik tok
     // (tik tok selected based on the pallete color that matches the pixel)
     public RenderTexture downscaleTexture;
+
+    // Shader for computing difference between current and last frame
+    // This is to pick up motion to determine when to reset frame index to 0
+    public Material diffMat;
+
+    // Texture that contains motion
+    public RenderTexture motionTexture;
+
+    // Texture containing the downscaled capture texture of the last frame
+    // Used to take a difference to set the frame index to 0
+    public RenderTexture previousDownscaledTexture;
 
     // Shader that converts downscaled image to image containing tik tok frames
     public ComputeShader tiktokShader;
@@ -110,6 +118,11 @@ public class Webcam : MonoBehaviour {
         tiktokShader.SetInts("ResultSize", new int[] { outTexture.width, outTexture.height });
         tiktokShader.SetInt("NumAtlas", numAtlas);
         tiktokShader.SetInt("NumVariants", numVariants);
+
+        //
+
+        diffMat.SetTexture("_TexA", downscaleTexture);
+        diffMat.SetTexture("_TexB", previousDownscaledTexture);
     }
 
     void Update() {
@@ -136,7 +149,31 @@ public class Webcam : MonoBehaviour {
         // Render
 
         // Downscale
-        Graphics.Blit(webcamTexture, downscaleTexture/*, effect*/);
+        Graphics.Blit(webcamTexture, downscaleTexture);
+
+        // Compute motion (On CPU for now)
+        {
+            Graphics.Blit(null, motionTexture, diffMat);
+
+            RenderTexture.active = motionTexture;
+            Texture2D tex = new Texture2D(motionTexture.width, motionTexture.height, TextureFormat.RFloat, false);
+            tex.ReadPixels(new Rect(0, 0, motionTexture.width, motionTexture.height), 0, 0);
+            tex.Apply();
+
+            Color[] pixels = tex.GetPixels();
+            float activeCount = 0f;
+            for (int i = 0; i < pixels.Length; i++)
+                activeCount += pixels[i].r; // 1 if active, 0 if not
+
+            float motionFraction = activeCount / pixels.Length;
+
+            // If there is motion, reset frame index to first frame of tik tok
+            if (activeCount > 0.05f) {
+                frame = 0;
+            }
+        }
+
+        Graphics.Blit(downscaleTexture, previousDownscaledTexture);
 
         tiktokShader.SetInt("ScrollOffset", scroll);
         tiktokShader.SetInt("AtlasIndex", frame / 36);

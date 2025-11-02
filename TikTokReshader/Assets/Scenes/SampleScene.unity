@@ -128,7 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 427555211}
-  - component: {fileID: 427555210}
+  - component: {fileID: 427555212}
   m_Layer: 0
   m_Name: webcam
   m_TagString: Untagged
@@ -136,7 +136,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &427555210
+--- !u!4 &427555211
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 427555209}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &427555212
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -150,20 +165,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pallete: {fileID: 2800000, guid: 3d39f3018c35d424d8c08498203b63be, type: 3}
   numVariants: 2
+  atlasFrameWidth: 6
+  atlasFrameHeight: 6
   numAtlas: 1
   tikTokWidth: 30
   tikTokHeight: 54
-  atlasFrameWidth: 6
-  atlasFrameHeight: 6
   atlas:
   - {fileID: 2800000, guid: ce4d8e7130346524d945709d1a8704b2, type: 3}
   - {fileID: 2800000, guid: ce4d8e7130346524d945709d1a8704b2, type: 3}
   outTexture: {fileID: 8400000, guid: cabcf23bd1e8ff34baeba1682583f853, type: 2}
   downscaleTexture: {fileID: 8400000, guid: 4f5daac5abfdc054ea8a7acad7490c0c, type: 2}
+  diffMat: {fileID: 2100000, guid: 7183d60c621da4e44ad0821284d4ef07, type: 2}
+  motionTexture: {fileID: 8400000, guid: ebec84d614c386f4eaf8ecba77700f19, type: 2}
+  previousDownscaledTexture: {fileID: 8400000, guid: a3509a4cebcde5c45a3e6a412e58d5e6, type: 2}
   tiktokShader: {fileID: 7200000, guid: d7da7ad2f002aaa40b4091928fd2bd33, type: 3}
-  frame: 0
   totalNumFrames: 36
-  scroll: 0
+  frameRate: 0.033333335
   doScroll: 0
   scrollCurve:
     serializedVersion: 2
@@ -189,24 +206,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  scrollDuration: 0.5
-  scrollTimer: 0
-  frameRate: 0.033333335
---- !u!4 &427555211
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 427555209}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  scrollAnimDuration: 0.5
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
