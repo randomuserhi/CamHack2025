@@ -1,5 +1,54 @@
 #pragma kernel TikTok
 
+float3 SRGBtoLinear(float3 c)
+{
+    return pow(c, 2.2); // approximate gamma correction
+}
+
+float3 RGBtoXYZ(float3 c)
+{
+    // D65 conversion matrix
+    float3x3 M = float3x3(
+        0.4124564, 0.3575761, 0.1804375,
+        0.2126729, 0.7151522, 0.0721750,
+        0.0193339, 0.1191920, 0.9503041
+    );
+    return mul(M, c);
+}
+
+float3 XYZtoLab(float3 xyz)
+{
+    // reference white D65
+    float3 ref = float3(0.95047, 1.00000, 1.08883);
+    xyz /= ref;
+
+    float3 f;
+    [unroll]
+    for (int i = 0; i < 3; i++)
+    {
+        f[i] = xyz[i] > 0.008856 ? pow(xyz[i], 1.0/3.0) : (7.787 * xyz[i]) + (16.0/116.0);
+    }
+
+    float L = (116.0 * f.y) - 16.0;
+    float a = 500.0 * (f.x - f.y);
+    float b = 200.0 * (f.y - f.z);
+    return float3(L, a, b);
+}
+
+float DeltaE(float3 c1, float3 c2)
+{
+    return length(c1 - c2); // Euclidean distance in Lab space
+}
+
+float ColorDistance_Lab(float3 rgb1, float3 rgb2)
+{
+    float3 lab1 = XYZtoLab(RGBtoXYZ(SRGBtoLinear(rgb1)));
+    float3 lab2 = XYZtoLab(RGBtoXYZ(SRGBtoLinear(rgb2)));
+    return DeltaE(lab1, lab2);
+}
+
+//
+
 uint Hash2D(uint x, uint y)
 {
     uint h = x * 374761393u + y * 668265263u;
@@ -50,17 +99,20 @@ void TikTok (uint3 id : SV_DispatchThreadID)
 	float dist = 1.0 / 0.0; // Infinity
 	for (uint i = 0; i < PalletSize.x; ++i) {
 	 	for (uint j = 0; j < PalletSize.y; ++j) {
-	 		uint2 coord = int2(i, j);
+	 		uint2 coord = uint2(i * 16, j * 16);
 	 		float4 palColor = Pallete.Load(uint3(coord, 0));
-	 		float d = dot(src - palColor, src - palColor);
+	 		
+			// float d = ColorDistance_Lab(src, palColor);
+			float d = dot(src - palColor, src - palColor);
+
 	 		if (d < dist) {
 	 			dist = d;
-	 			chosen = coord;
+	 			chosen = uint2(i, j);
 	 		}
 	 	}
 	}
 
-	uint variant = RandomUInt(id.x, id.y, NumVariants);
+	uint variant = RandomUInt(sourceCoord.x, sourceCoord.y, NumVariants);
 	uint yScrolled = id.y + ScrollOffset;
 	uint2 vidCoord = uint2(id.x % TikTokSize.x, yScrolled % TikTokSize.y);
 	variant = (variant - (yScrolled / TikTokSize.y)) % NumVariants;
@@ -70,4 +122,6 @@ void TikTok (uint3 id : SV_DispatchThreadID)
 	tiktokCoord.y = FrameCoord.y * TikTokSize.y * PalletSize.y + chosen.y * TikTokSize.y + vidCoord.y;
 
     Result[id.xy] = Atlas.Load(uint4(tiktokCoord, variant * NumAtlas + AtlasIndex, 0));
+
+	// Result[id.xy] = Pallete.Load(uint3(chosen.x * 16, chosen.y * 16, 0));
 }

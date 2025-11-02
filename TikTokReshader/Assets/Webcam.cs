@@ -5,6 +5,8 @@ public class Webcam : MonoBehaviour {
 
     // Color pallate for mapping colours to tik toks from atlas
     public Texture2D pallete;
+    public int palletWidth = 16;
+    public int palletHeight = 16;
 
     // Number of variants we have (different tik toks for the same color)
     public int numVariants = 1;
@@ -44,6 +46,9 @@ public class Webcam : MonoBehaviour {
     // This is to pick up motion to determine when to reset frame index to 0
     public Material diffMat;
 
+    // Shader for blurring the webcam footage
+    public Material blurMat;
+
     // Texture that contains motion
     public RenderTexture motionTexture;
 
@@ -77,7 +82,7 @@ public class Webcam : MonoBehaviour {
 
     void Start() {
         // Get the first available camera
-        string camName = WebCamTexture.devices.Length > 0 ? WebCamTexture.devices[0].name : null;
+        string camName = WebCamTexture.devices.Length > 0 ? WebCamTexture.devices[1].name : null;
         Debug.Log(camName);
         if (camName == null) {
             Debug.LogError("No webcam detected!");
@@ -92,7 +97,7 @@ public class Webcam : MonoBehaviour {
         FramesPerAtlas = atlasFrameWidth * atlasFrameHeight;
 
         // Create a Texture2DArray
-        textureArray = new Texture2DArray(tikTokWidth * pallete.width * atlasFrameWidth, tikTokHeight * pallete.height * atlasFrameHeight, atlas.Length, TextureFormat.ARGB32, false);
+        textureArray = new Texture2DArray(tikTokWidth * palletWidth * atlasFrameWidth, tikTokHeight * palletHeight * atlasFrameHeight, atlas.Length, TextureFormat.ARGB32, false);
         textureArray.filterMode = FilterMode.Point;
         textureArray.wrapMode = TextureWrapMode.Clamp;
 
@@ -114,7 +119,7 @@ public class Webcam : MonoBehaviour {
         tiktokShader.SetTexture(tiktokKernel, "Atlas", textureArray);
 
         tiktokShader.SetInts("TikTokSize", new int[] { tikTokWidth, tikTokHeight });
-        tiktokShader.SetInts("PalletSize", new int[] { pallete.width, pallete.height });
+        tiktokShader.SetInts("PalletSize", new int[] { palletWidth, palletHeight });
         tiktokShader.SetInts("AtlasFrameSize", new int[] { atlasFrameWidth, atlasFrameHeight });
         tiktokShader.SetInts("ResultSize", new int[] { outTexture.width, outTexture.height });
         tiktokShader.SetInt("NumAtlas", numAtlas);
@@ -152,7 +157,7 @@ public class Webcam : MonoBehaviour {
         // Render
 
         // Downscale
-        Graphics.Blit(webcamTexture, downscaleTexture);
+        Graphics.Blit(webcamTexture, downscaleTexture/*, blurMat*/);
 
         // Compute motion (On CPU for now)
         {
@@ -172,7 +177,7 @@ public class Webcam : MonoBehaviour {
 
             // If there is motion, reset frame index to first frame of tik tok
             if (activeCount > 0.1f) {
-                frame = 0;
+                frame = totalNumFrames - 1;
             }
         }
 
@@ -196,7 +201,8 @@ public class Webcam : MonoBehaviour {
         frameTimer += Time.deltaTime;
         if (frameTimer > frameRate) {
             frameTimer = 0;
-            frame = (++frame) % totalNumFrames;
+            frame = (--frame) % totalNumFrames;
+            if (frame < 0) frame += totalNumFrames;
         }
     }
 
