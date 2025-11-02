@@ -31,10 +31,10 @@ html, body {
   let onSwipe = (direction, ev) => {
     document.getElementById('container').textContent = "move " + direction;
 
-    let action = (direction == "up") ? "forward" : (direction == "down") ? "backard" : null;
+    let action = (direction == "up") ? "forward" : (direction == "down") ? "backward" : null;
 
     if (action) {
-      fetch(`/action/${direction}`, {method: 'POST'})
+      fetch(`/action/${action}`, {method: 'POST'})
     }
   }
   let onTap = (info) => {
