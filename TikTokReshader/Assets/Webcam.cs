@@ -157,7 +157,7 @@ public class Webcam : MonoBehaviour {
         // Render
 
         // Downscale
-        Graphics.Blit(webcamTexture, downscaleTexture/*, blurMat*/);
+        Graphics.Blit(webcamTexture, downscaleTexture, blurMat);
 
         // Compute motion (On CPU for now)
         {
@@ -176,7 +176,7 @@ public class Webcam : MonoBehaviour {
             float motionFraction = activeCount / pixels.Length;
 
             // If there is motion, reset frame index to first frame of tik tok
-            if (activeCount > 0.1f) {
+            if (activeCount > 0.2f) {
                 frame = totalNumFrames - 1;
             }
         }
@@ -203,6 +203,7 @@ public class Webcam : MonoBehaviour {
             frameTimer = 0;
             frame = (--frame) % totalNumFrames;
             if (frame < 0) frame += totalNumFrames;
+            Debug.Log($"frame: {frame}");
         }
     }
 

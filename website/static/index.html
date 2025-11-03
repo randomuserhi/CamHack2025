@@ -2,199 +2,28 @@
 <html lang="en">
 
 <head>
-  <meta name="description" content="Webpage description goes here" />
-  <meta charset="utf-8">
-  <title>Tiktok</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="author" content="">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="default.css">
+
+    <!-- TODO(randomuserhi): Move to be an offline font -->
+    <link rel="stylesheet" href="font.css">
+
+    <title>TikTok</title>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "rhu": "./js3party/rhu/rhu.js",
+            "rhu/": "./js3party/rhu/",
+            "fuse.js": "./js3party/fuse/fuse.min.mjs"
+        }
+    }
+    </script>
+    <script type="module" src="./app.js"></script>
 </head>
 
-<body>
+<body style="display: flex; flex-direction: column;"></body>
 
-<div id="container">
-</div>
-
-<style>
-html, body {
-  overscroll-behavior: none;
-}
-</style>
-
-<script>
-  const SWIPE_THRESHOLD = 30            // px required to start a swipe
-  const MAX_TAP_MOVEMENT = 10          // px allowed during a tap
-  const MAX_TAP_DURATION = 250         // ms max between down/up for a tap
-  const DOUBLE_TAP_DELAY = 300         // ms window to consider a second tap for double-tap
-  const DOUBLE_TAP_MAX_DISTANCE = 40   // px max distance between two taps to count as double-tap
-
-  // Public handlers (replace by calling set...Handler)
-  let onSwipe = (direction, ev) => {
-    document.getElementById('container').textContent = "move " + direction;
-
-    let action = (direction == "up") ? "forward" : (direction == "down") ? "backward" : null;
-
-    if (action) {
-      fetch(`/action/${action}`, {method: 'POST'})
-    }
-  }
-  let onTap = (info) => {
-    document.getElementById('container').textContent = "tap";
-
-    fetch(`/action/interact`, {method: 'POST'}
-    )
-  }
-  let onDoubleTap = (info) => {
-    document.getElementById('container').textContent = "doubletap";
-
-    fetch(`/action/shoot`, {method: 'POST'})
-  }
-
-  // Internal gesture state
-  let activeId = null
-  let startX = 0
-  let startY = 0
-  let startTime = 0
-  let moved = false
-  let swipeDetected = false
-
-  // Double-tap state
-  let lastTapTime = 0
-  let lastTapX = 0
-  let lastTapY = 0
-  let singleTapTimer = null
-
-  function distance(aX, aY, bX, bY) {
-    const dx = aX - bX
-    const dy = aY - bY
-    return Math.hypot(dx, dy)
-  }
-
-  function detectSwipeIfNeeded(x, y, ev) {
-    if (swipeDetected) return
-    const dx = x - startX
-    const dy = y - startY
-    const absDx = Math.abs(dx)
-    const absDy = Math.abs(dy)
-
-    // Only consider it a swipe when the movement exceeds SWIPE_THRESHOLD on either axis
-    if (absDx >= SWIPE_THRESHOLD || absDy >= SWIPE_THRESHOLD) {
-      swipeDetected = true
-      // Choose dominant axis
-      if (absDx > absDy) {
-        onSwipe(dx > 0 ? 'right' : 'left', ev)
-      } else {
-        onSwipe(dy > 0 ? 'down' : 'up', ev)
-      }
-    }
-  }
-
-  function handleTap(x, y, time, sourceEvent) {
-    const now = time
-    const sinceLast = now - lastTapTime
-
-    // Double-tap detection
-    if (sinceLast > 0 && sinceLast <= DOUBLE_TAP_DELAY &&
-      distance(x, y, lastTapX, lastTapY) <= DOUBLE_TAP_MAX_DISTANCE) {
-      // Cancel pending single tap
-      if (singleTapTimer) {
-        clearTimeout(singleTapTimer)
-        singleTapTimer = null
-      }
-      lastTapTime = 0
-      lastTapX = 0
-      lastTapY = 0
-      onDoubleTap({ x, y, time: now, sourceEvent })
-      return
-    }
-
-    // Schedule single tap to allow a second tap to override it
-    lastTapTime = now
-    lastTapX = x
-    lastTapY = y
-
-    if (singleTapTimer) clearTimeout(singleTapTimer)
-    singleTapTimer = setTimeout(() => {
-      singleTapTimer = null
-      lastTapTime = 0
-      onTap({ x, y, time: now, sourceEvent })
-    }, DOUBLE_TAP_DELAY)
-  }
-
-  function resetState() {
-    activeId = null
-    startX = 0
-    startY = 0
-    startTime = 0
-    moved = false
-    swipeDetected = false
-  }
-
-  // Pointer Events only implementation
-  document.addEventListener('pointerdown', (e) => {
-    // track only primary pointer to avoid multi-touch complexity
-    if (!e.isPrimary) return
-    activeId = e.pointerId
-    startX = e.clientX
-    startY = e.clientY
-    startTime = e.timeStamp || Date.now()
-    moved = false
-    swipeDetected = false
-  }, { passive: true })
-
-  document.addEventListener('pointermove', (e) => {
-    if (activeId === null || e.pointerId !== activeId) return
-
-    const dx = e.clientX - startX
-    const dy = e.clientY - startY
-    if (Math.abs(dx) > MAX_TAP_MOVEMENT || Math.abs(dy) > MAX_TAP_MOVEMENT) {
-      moved = true
-    }
-
-    // detect swipe as soon as threshold crossed
-    detectSwipeIfNeeded(e.clientX, e.clientY, e)
-  }, { passive: true })
-
-  document.addEventListener('pointerup', (e) => {
-    if (activeId === null || e.pointerId !== activeId) return
-
-    // If a swipe was already fired, do nothing else for this gesture
-    if (swipeDetected) {
-      resetState()
-      return
-    }
-
-    const endTime = e.timeStamp || Date.now()
-    const duration = endTime - startTime
-
-    // If not moved too much and within duration, consider it a tap
-    if (!moved && duration <= MAX_TAP_DURATION) {
-      handleTap(e.clientX, e.clientY, endTime, e)
-    }
-
-    resetState()
-  })
-
-  document.addEventListener('pointercancel', () => resetState())
-
-  // Expose API on window for non-module usage
-  // if (typeof window !== 'undefined') {
-  //   window.gestureTapDouble = {
-  //     setSwipeHandler,
-  //     setTapHandler,
-  //     setDoubleTapHandler,
-  //     // expose thresholds in case callers want to tune them
-  //     _config: {
-  //       SWIPE_THRESHOLD,
-  //       MAX_TAP_MOVEMENT,
-  //       MAX_TAP_DURATION,
-  //       DOUBLE_TAP_DELAY,
-  //       DOUBLE_TAP_MAX_DISTANCE
-  //     }
-  //   }
-  // }
-
-</script>
-
-</body>
 </html>
-
