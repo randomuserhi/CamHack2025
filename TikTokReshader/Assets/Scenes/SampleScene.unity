@@ -166,27 +166,27 @@ MonoBehaviour:
   pallete: {fileID: 2800000, guid: a4dd1c6fa60a492438ef9588afd1b447, type: 3}
   palletWidth: 16
   palletHeight: 16
-  numVariants: 1
+  numVariants: 5
   atlasFrameWidth: 6
   atlasFrameHeight: 6
-  numAtlas: 5
+  numAtlas: 3
   tikTokWidth: 30
   tikTokHeight: 54
   atlas:
   - {fileID: 2800000, guid: 6a8ad2968f0a9144789b509d8dc6dc58, type: 3}
-  - {fileID: 2800000, guid: e9a6b83ab58b10c42b06b1d74de7ee24, type: 3}
-  - {fileID: 2800000, guid: e61150819c7aa9640974c32ecfbf0ef0, type: 3}
-  - {fileID: 2800000, guid: 9b7eecaab8e65174695b76a58d37ac9f, type: 3}
-  - {fileID: 2800000, guid: ddc8d0fd9181cf145a1ddf829f052920, type: 3}
   - {fileID: 2800000, guid: e251bd58bce45eb428b29f4ae8c3dc32, type: 3}
-  - {fileID: 2800000, guid: e10cd5781fcd786438bc7715f479b525, type: 3}
-  - {fileID: 2800000, guid: 05c68c5e8558c494986af9e798d8b73f, type: 3}
-  - {fileID: 2800000, guid: 67fd25f84dd149244810b9445efb1d3e, type: 3}
-  - {fileID: 2800000, guid: 0a3aa7cad6491b74ba94738eb85982a8, type: 3}
   - {fileID: 2800000, guid: d58c692087e257145ad5e5c4d719802f, type: 3}
+  - {fileID: 2800000, guid: e9a6b83ab58b10c42b06b1d74de7ee24, type: 3}
+  - {fileID: 2800000, guid: e10cd5781fcd786438bc7715f479b525, type: 3}
   - {fileID: 2800000, guid: 6c32c65e4d838a243862ea016236baf9, type: 3}
+  - {fileID: 2800000, guid: e61150819c7aa9640974c32ecfbf0ef0, type: 3}
+  - {fileID: 2800000, guid: 05c68c5e8558c494986af9e798d8b73f, type: 3}
   - {fileID: 2800000, guid: b9e9a2cf907e8564bae008460ac8c9cd, type: 3}
+  - {fileID: 2800000, guid: 9b7eecaab8e65174695b76a58d37ac9f, type: 3}
+  - {fileID: 2800000, guid: 67fd25f84dd149244810b9445efb1d3e, type: 3}
   - {fileID: 2800000, guid: 67b7a2e246b55ce43857b37c2b953ad6, type: 3}
+  - {fileID: 2800000, guid: ddc8d0fd9181cf145a1ddf829f052920, type: 3}
+  - {fileID: 2800000, guid: 0a3aa7cad6491b74ba94738eb85982a8, type: 3}
   - {fileID: 2800000, guid: 43f3ee58372612044be6275769dabaf7, type: 3}
   outTexture: {fileID: 8400000, guid: cabcf23bd1e8ff34baeba1682583f853, type: 2}
   downscaleTexture: {fileID: 8400000, guid: 4f5daac5abfdc054ea8a7acad7490c0c, type: 2}
@@ -195,7 +195,7 @@ MonoBehaviour:
   motionTexture: {fileID: 8400000, guid: ebec84d614c386f4eaf8ecba77700f19, type: 2}
   previousDownscaledTexture: {fileID: 8400000, guid: a3509a4cebcde5c45a3e6a412e58d5e6, type: 2}
   tiktokShader: {fileID: 7200000, guid: d7da7ad2f002aaa40b4091928fd2bd33, type: 3}
-  totalNumFrames: 180
+  totalNumFrames: 108
   frameRate: 0.033333335
   doScroll: 0
   scrollCurve:

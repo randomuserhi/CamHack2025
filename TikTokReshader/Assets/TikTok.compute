@@ -112,10 +112,9 @@ void TikTok (uint3 id : SV_DispatchThreadID)
 	 	}
 	}
 
-	uint variant = RandomUInt(sourceCoord.x, sourceCoord.y, NumVariants);
-	uint yScrolled = id.y + ScrollOffset;
-	uint2 vidCoord = uint2(id.x % TikTokSize.x, yScrolled % TikTokSize.y);
-	variant = (variant - (yScrolled / TikTokSize.y)) % NumVariants;
+	uint variant = 0; //RandomUInt(sourceCoord.x, sourceCoord.y, NumVariants);
+	uint2 vidCoord = uint2(id.x % TikTokSize.x, (id.y + ScrollOffset) % TikTokSize.y);
+	variant = (variant - (((id.y % TikTokSize.y) + ScrollOffset) / TikTokSize.y)) % NumVariants;
 
 	uint2 tiktokCoord;
 	tiktokCoord.x = FrameCoord.x * TikTokSize.x * PalletSize.x + chosen.x * TikTokSize.x + vidCoord.x;

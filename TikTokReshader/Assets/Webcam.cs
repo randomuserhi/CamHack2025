@@ -177,18 +177,18 @@ public class Webcam : MonoBehaviour {
 
             // If there is motion, reset frame index to first frame of tik tok
             if (activeCount > 0.2f) {
-                frame = totalNumFrames - 1;
+                frame = 0;
             }
         }
 
         Graphics.Blit(downscaleTexture, previousDownscaledTexture);
 
         tiktokShader.SetInt("ScrollOffset", scrollMultiple * tikTokHeight + scroll);
-        tiktokShader.SetInt("AtlasIndex", frame / 36);
+        tiktokShader.SetInt("AtlasIndex", frame / FramesPerAtlas);
 
-        int subFrame = frame % 36;
+        int subFrame = frame % FramesPerAtlas;
         frameCoord[0] = subFrame % atlasFrameWidth;
-        frameCoord[1] = subFrame / atlasFrameWidth;
+        frameCoord[1] = atlasFrameHeight - (subFrame / atlasFrameWidth) - 1;
         tiktokShader.SetInts("FrameCoord", frameCoord);
 
         // Dispatch threads
@@ -201,9 +201,7 @@ public class Webcam : MonoBehaviour {
         frameTimer += Time.deltaTime;
         if (frameTimer > frameRate) {
             frameTimer = 0;
-            frame = (--frame) % totalNumFrames;
-            if (frame < 0) frame += totalNumFrames;
-            Debug.Log($"frame: {frame}");
+            frame = (++frame) % totalNumFrames;
         }
     }
 
